@@ -30,16 +30,16 @@ class RegistrationsView(APIView):
                 )
             return Response(serializer.data, status=HTTPStatus.CREATED)
 
-class ActivationView(APIView):
-    def get(self, request):
-        code = request.query_params.get('u')
-        user = get_object_or_404(User, activation_code=code)
-        user.is_active = True
-        user.activation_code = ''
-        user.save()
-        return Response('Активирован', status=HTTPStatus.OK)
+# class ActivationView(APIView):
+#     def get(self, request):
+#         code = request.query_params.get('u')
+#         user = get_object_or_404(User, activation_code=code)
+#         user.is_active = True
+#         user.activation_code = ''
+#         user.save()
+#         return Response('Активирован', status=HTTPStatus.OK)
 
-class ActivationPostView(APIView):
+class ActivationView(APIView):
     def post(self, request):
         activation_code = request.data.get('activation_code')
         if not activation_code:
