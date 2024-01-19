@@ -25,3 +25,6 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
         return user
+    
+class LogOutSerialzer(serializers.Serializer):
+    refresh = serializers.CharField(required=True, write_only=True)
