@@ -6,7 +6,7 @@ from .serializers import RegisterSerializer, LogOutSerialzer
 from django.contrib.auth import get_user_model
 from .send_email import send_confirmation_email
 from django.shortcuts import get_object_or_404
-from .tasks import send_confirm_email_task
+from .tasks import send_confirm_email_task, send_password_reset_task
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import permissions
 
@@ -74,6 +74,35 @@ class LogoutView(APIView):
         token = RefreshToken(refresh_token)
         token.blacklist()
         return Response('Успешно разлогинилсь', 200)
+
+
+class CustomResetPasswordView(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        user = User.objects.get(email=email)
+        user_id = user.id
+        if not user:
+            return Response({'ValidationError': 'Нет такого пользователя'}, status=HTTPStatus.BAD_REQUEST)
+        
+        send_password_reset_task.delay(email=email, user_id=user_id)
+        return Response('Вам на почту отправили сообщение', 200)
+    
+
+class CustomPasswordConfirmView(APIView):
+    def post(self, request, *args, **kwargs):
+        new_password = request.data.get('new_password')
+        password_confirm = request.data.get('password_confirm')
+        user_id = self.kwargs.get('uidb64')
+        user = User.objects.get(id=user_id)
+        if new_password != password_confirm:
+            return Response('Пароли не совпадают', 404)
+        user.set_password(new_password)
+        user.save()
+        return Response('Ваш пароль изменен!', 201)
+        
+
+
+
 
 #
 # class ActivationView(APIView):
