@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import Product
 from apps.category.models import Category
+from django.db.models import Avg
 
 
 class ProductSerializer(serializers.ModelSerializer):
@@ -12,3 +13,11 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = '__all__'
     
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['rating'] = instance.ratings.aggregate(
+            Avg('rating')
+        )
+        rating = rep['rating']
+        rating['rating_count'] = instance.ratings.count()
+        return rep
