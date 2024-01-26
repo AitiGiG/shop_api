@@ -15,6 +15,6 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'spam' : {
         'task':'apps.account.tasks.send_spam_task',
-        'schedule':5
+        'schedule':crontab(hour=23)
     }
 }

@@ -20,18 +20,18 @@ class RegistrationView(APIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         if user:
-            try:
+            send_confirm_email_task.delay(user.email, user.activation_code)
+            # try:
+            #     # send_confirmation_email(user.email, user.activation_code)
+            #     send_confirm_email_task.delay(user.email, user.activation_code)
                 
-                # send_confirmation_email(user.email, user.activation_code)
-                send_confirm_email_task.delay(user.email, user.activation_code)
-                
-            except:
-                return Response(
-                    {
-                        'message': 'Че то не то, на почте нет ниче',
-                        'data': serializer.data
-                    }, status=HTTPStatus.CREATED
-                )
+            # except Exception as e:
+            #     return Response(
+            #         {
+            #             'message': f'Че то не то, на почте нет ниче {e}',
+            #             'data': serializer.data
+            #         }, status=HTTPStatus.CREATED
+            #     )
             return Response(serializer.data, status=HTTPStatus.CREATED)
 
 # class ActivationView(APIView):

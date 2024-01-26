@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 from django.utils.html import format_html
 
 def send_confirmation_email(email, code):
-    activation_url = f'http://localhost:8000/account/activate/?u={code}'
+    activation_url = f'http://localhost/account/activate/?u={code}'
     message = format_html(
         'Здравствуйте, активируйте ваш аккаунт'
         'Чтобы активировать аккаунт, перейдите по ссылке'
